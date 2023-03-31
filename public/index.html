@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<body>
+
+<div ng-app="listProducts" ng-controller="productsCtrl">
+
+<h1>Listing {{products.length}} Product(s)</h1>
+
+<input type="text" ng-model="searchTerm" />
+<input type="button" value="Search By Scrum Master" ng-click="doSearch('scrumMasterName');" />
+<input type="button" value="Search By Developer" ng-click="doSearch('Developers');" />
+<input type="button" value="Clear Search" onclick="window.location.reload();" />
+<br />
+<br />
+
+<input type="button" value="Add New Product" onclick="location.href = 'save.html';" />
+<br />
+<br />
+
+<table>
+
+<thead>
+  <tr>
+    <th>Product Number</th>
+    <th>Product Name</th>
+    <th>Scrum Master</th>
+    <th>Product Owner</th>
+    <th>Developer Names</th>
+    <th>Start Date</th>
+    <th>Methodology</th>
+    <th>Edit</th>
+  </tr>
+</thead>
+
+<tbody>
+  <tr ng-repeat="product in products">
+    <td>{{product.productId}}</td>
+    <td>{{product.productName}}</td>
+    <td>{{product.scrumMasterName}}</td>
+    <td>{{product.productOwnerName}}</td>
+    <td>
+      <ul>
+        <!-- track required to not cause dupe error, add if to avoid blank bullet -->
+        <li ng-repeat="developer in product.Developers track by $index" ng-if="developer">{{developer}}</li>
+      </ul>
+    </td>
+    <td>{{product.startDate}}</td>
+    <td>{{product.methodology}}</td>
+    <td>
+      <form action="save.html">
+        <input type="hidden" name="id" value="{{product.productId}}" />
+        <input type="submit" value="Edit" />
+      </form>
+    </td>
+  </tr>
+</tbody>
+</table>
+
+<input type="button" value="Add New Product" onclick="location.href = 'save.html';" />
+
+</div>
+
+<script>
+var app = angular.module('listProducts', []);
+app.controller('productsCtrl', function($scope, $http) {
+  $http.get('http://localhost:3000/api/product').then(function(res) {
+    $scope.products = res.data;
+  }, function(error) {
+    alert(JSON.stringify(error));
+  });
+
+  $scope.doSearch = function(searchBy) {
+    if ($scope.searchTerm) {
+      $http.get('http://localhost:3000/api/product?' + searchBy + '=' + $scope.searchTerm).then(function(res) {
+        $scope.products = res.data;
+      }, function(error) {
+        alert(JSON.stringify(error));
+      });
+    }
+  };
+});
+</script> 
+
+</body>
+</html>

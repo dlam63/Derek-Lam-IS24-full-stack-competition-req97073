@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<body>
+
+<div ng-app="saveProduct" ng-controller="saveCtrl">
+
+<h1 ng-if="product.productId">Editing Product Number {{product.productId}}</h1>
+<h1 ng-if="!product.productId">Add New Product</h1>
+
+<form ng-submit="doSave();">
+
+  <label for="productName">Product Name</label>
+  <input id="productName" name="productName" type="text" ng-model="product.productName" required />
+  <br />
+
+  <label for="scrumMasterName">Scrum Master Name</label>
+  <input id="scrumMasterName" name="scrumMasterName" ng-model="product.scrumMasterName" type="text" required />
+  <br />
+
+  <label for="productOwnerName">Product Owner Name</label>
+  <input id="productOwnerName" name="productOwnerName" ng-model="product.productOwnerName" type="text" required />
+  <br />
+
+  <label for="Developers1">Developer 1</label>
+  <input id="Developers1" name="Developers[]" ng-model="product.Developers[0]" type="text" required />
+  <br />
+  <label for="Developers2">Developer 2</label>
+  <input id="Developers2" name="Developers[]" ng-model="product.Developers[1]" type="text" />
+  <br />
+  <label for="Developers3">Developer 3</label>
+  <input id="Developers3" name="Developers[]" ng-model="product.Developers[2]" type="text" />
+  <br />
+  <label for="Developers4">Developer 4</label>
+  <input id="Developers4" name="Developers[]" ng-model="product.Developers[3]" type="text" />
+  <br />
+  <label for="Developers5">Developer 5</label>
+  <input id="Developers5" name="Developers[]" ng-model="product.Developers[4]" type="text" />
+  <br />
+
+  <div ng-if="!product.productId">
+  <label for="startDate">Start Date</label>
+  <input id="startDate" name="startDate" ng-model="product.startDate" type="text" required />
+  <br />
+  </div>
+
+  <label for="methodology">Methodology</label>
+  <label for="agile">Agile</label>
+  <input id="agile" name="methodology" ng-model="product.methodology" type="radio" required value="Agile" />
+  <label for="waterfall">Waterfall</label>
+  <input id="waterfall" name="methodology" ng-model="product.methodology" type="radio" required value="Waterfall" />
+  <br />
+
+  <input type="submit" value="Save" />
+</form>
+
+</div>
+
+<script>
+var app = angular.module('saveProduct', []);
+app.controller('saveCtrl', function($scope, $http) {
+
+  var id = parseInt(location.search.substring(('?id=').length));
+
+  if (id) {
+    $http.get('http://localhost:3000/api/product/' + id).then(function(res) {
+      $scope.product = res.data;
+    }).catch(function(error) {
+      alert(JSON.stringify(error));
+    });
+  }
+
+  $scope.doSave = function() {
+    if ($scope.product.productId) {
+      $http.put('http://localhost:3000/api/product/' + $scope.product.productId, $scope.product).then(function(res) {
+        location.href = 'index.html';
+      }, function(error) {
+        alert(JSON.stringify(error));
+      });
+    } else {
+      $http.post('http://localhost:3000/api/product', $scope.product).then(function(res) {
+        location.href = 'index.html';
+      }, function(error) {
+        alert(JSON.stringify(error));
+      });
+    }
+  }
+});
+</script> 
+
+</body>
+</html>
